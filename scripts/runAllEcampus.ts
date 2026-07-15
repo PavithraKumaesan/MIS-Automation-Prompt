@@ -30,7 +30,7 @@
  * scripts/consolidateReports.ts to merge Report_PO.env / Report_VCC.env /
  * Report_TB.env / Report_payroll.env / Report_Accounts.env /
  * Report_TB_Revisit.env / Report_Budget.env / Report_FinancialYear.env /
- * Report_Reports.env / Report_AuditLogs.env into Report_Consolidated.md.
+ * Report_Reports.env / Report_AuditLogs.env into MIS_Consolidated.xlsx.
  *
  * Run with:
  *   npm run run-all:ecampus

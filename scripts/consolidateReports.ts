@@ -2,17 +2,31 @@
  * Consolidates Report_PO.env, Report_VCC.env, Report_TB.env,
  * Report_payroll.env, Report_Accounts.env, Report_TB_Revisit.env,
  * Report_Budget.env, Report_FinancialYear.env, Report_Reports.env, and
- * Report_AuditLogs.env into a single, human-readable plain-text report:
- * Report_Consolidated.md — one banner-style section per module, each a flat
- * bullet list of its validation results/timings/alerts. Alert-type lines
- * (mismatches, over-threshold timings, failures) get an inline "WARNING: "
- * prefix rather than being split into a separate subsection. Any duration
- * embedded in a message as raw milliseconds (e.g. "1345ms") is converted to
- * seconds, or minutes+seconds once it reaches 60s, for readability.
+ * Report_AuditLogs.env into a single Excel workbook: MIS_Consolidated.xlsx.
+ *
+ * Replaces the previous Markdown output (Report_Consolidated.md) with the
+ * user's Excel reporting template — one ROW per module rather than one
+ * banner section, with each module's log lines split into columns instead
+ * of a flat bullet list:
+ *   Module | Time Duration | Header Comparison | Account Code | Warning | No Action
+ *
+ * Every line in a module's report file is classified into exactly one
+ * column:
+ *   - "Header Comparison Result: ..." lines (MATCH or NOT MATCH)  -> Header Comparison
+ *   - Payroll_Acct_code validation lines (pass or fail)           -> Account Code
+ *   - Always-logged raw duration lines (e.g. "...: 1345ms")       -> Time Duration
+ *   - Everything else (threshold-breach alerts, failed
+ *     clicks/validations, missing sections, etc.)                 -> Warning
+ * A module whose report file is empty or missing gets a note in the
+ * No Action column instead, with the other four columns left blank.
+ *
+ * Any duration embedded in a message as raw milliseconds (e.g. "1345ms") is
+ * converted to seconds, or minutes+seconds once it reaches 60s, for
+ * readability, same as the previous Markdown version.
  *
  * Purely reads/writes local files — no browser, no login, so it runs
- * instantly and can be invoked any time, independent of which of the four
- * upload scripts have actually been run.
+ * instantly and can be invoked any time, independent of which modules have
+ * actually been run.
  *
  * Run with:
  *   npm run consolidate:ecampus
@@ -24,9 +38,9 @@
 
 import fs from 'fs';
 import path from 'path';
+import ExcelJS from 'exceljs';
 
-const OUTPUT_PATH = path.resolve('Report_Consolidated.md');
-const BANNER = '='.repeat(30);
+const OUTPUT_PATH = path.resolve('MIS_Consolidated.xlsx');
 
 interface ReportSource {
   title: string;
@@ -47,9 +61,14 @@ const REPORT_SOURCES: ReportSource[] = [
 ];
 
 const ENTRY_PATTERN = /^\[(.+?)\]\s*(.*)$/;
-// Heuristic: these substrings indicate a genuine alert/warning line, as
-// opposed to a purely informational one (durations, MATCH results, etc.).
-const ALERT_PATTERN = /does not match|is taking more than|not matching|NOT MATCH|timed out|could not|failed|not found/i;
+const HEADER_COMPARISON_PATTERN = /header comparison result/i;
+const ACCOUNT_CODE_PATTERN = /payroll_acct_code|account code number/i;
+// Matches the raw "<number>ms" suffix every always-logged duration line in
+// this project uses (e.g. "Batches page load time: 1353ms") — conditional
+// threshold-breach alerts are phrased in whole seconds ("...more than 2
+// seconds.") with no embedded "ms", so they never match this and correctly
+// fall through to the Warning catch-all instead.
+const DURATION_PATTERN = /\d+\s*ms\b/;
 
 /** Converts a millisecond count to "X sec" (under 60s) or "X min Y sec" (60s+). */
 function formatDuration(ms: number): string {
@@ -68,44 +87,105 @@ function humanizeDurations(message: string): string {
   return message.replace(/(\d+)\s*ms\b/g, (_match, msDigits: string) => formatDuration(parseInt(msDigits, 10)));
 }
 
-/** Reads a report file and returns its entries as display-ready bullet text (WARNING-prefixed where applicable), or null if the file doesn't exist. */
-function readEntries(filePath: string): string[] | null {
+/** "PO Report" -> "PO", "Internal Accounts Report" -> "Internal Accounts", etc. */
+function moduleNameFromTitle(title: string): string {
+  return title.replace(/\s*Report$/i, '').trim();
+}
+
+interface ModuleRowData {
+  module: string;
+  timeDuration: string[];
+  headerComparison: string[];
+  accountCode: string[];
+  warning: string[];
+  noAction: string[];
+}
+
+/**
+ * Reads one module's report file and classifies every line into exactly
+ * one of the four result columns, or fills No Action if the module has no
+ * entries (or hasn't been run at all yet).
+ */
+function buildModuleRow(source: ReportSource): ModuleRowData {
+  const row: ModuleRowData = {
+    module: moduleNameFromTitle(source.title),
+    timeDuration: [],
+    headerComparison: [],
+    accountCode: [],
+    warning: [],
+    noAction: [],
+  };
+
+  const filePath = path.resolve(source.file);
   if (!fs.existsSync(filePath)) {
-    return null;
+    row.noAction.push('Module has not been run yet.');
+    return row;
   }
+
   const lines = fs.readFileSync(filePath, 'utf-8').split(/\r?\n/).filter((line) => line.trim() !== '');
-  const entries: string[] = [];
+  if (lines.length === 0) {
+    row.noAction.push('Currently, no actions were performed in this module.');
+    return row;
+  }
+
   for (const line of lines) {
     const match = line.match(ENTRY_PATTERN);
     if (!match) continue;
     const [, , rawMessage] = match;
     const message = humanizeDurations(rawMessage);
-    entries.push(ALERT_PATTERN.test(rawMessage) ? `WARNING: ${message}` : message);
+
+    if (HEADER_COMPARISON_PATTERN.test(rawMessage)) {
+      row.headerComparison.push(message);
+    } else if (ACCOUNT_CODE_PATTERN.test(rawMessage)) {
+      row.accountCode.push(message);
+    } else if (DURATION_PATTERN.test(rawMessage)) {
+      row.timeDuration.push(message);
+    } else {
+      // Catch-all: every remaining message in this project is either a
+      // conditional threshold-breach alert or a tryStep failure alert —
+      // both are genuine warnings, so nothing falls through uncategorized.
+      row.warning.push(message);
+    }
   }
-  return entries;
+
+  return row;
 }
 
-function buildSection(source: ReportSource): string {
-  const header = `${BANNER}\n${source.title}\n${BANNER}`;
-  const entries = readEntries(path.resolve(source.file));
+async function main() {
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet('MIS Consolidated Report');
 
-  if (entries === null) {
-    return `${header}\n(No ${source.file} found — this module hasn't been run yet.)`;
+  sheet.columns = [
+    { header: 'Module', key: 'module', width: 22 },
+    { header: 'Time Duration', key: 'timeDuration', width: 45 },
+    { header: 'Header Comparison', key: 'headerComparison', width: 45 },
+    { header: 'Account Code', key: 'accountCode', width: 50 },
+    { header: 'Warning', key: 'warning', width: 60 },
+    { header: 'No Action', key: 'noAction', width: 45 },
+  ];
+
+  const headerRow = sheet.getRow(1);
+  headerRow.font = { bold: true };
+  headerRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+  for (const source of REPORT_SOURCES) {
+    const data = buildModuleRow(source);
+    const row = sheet.addRow({
+      module: data.module,
+      timeDuration: data.timeDuration.join('\n'),
+      headerComparison: data.headerComparison.join('\n'),
+      accountCode: data.accountCode.join('\n'),
+      warning: data.warning.join('\n'),
+      noAction: data.noAction.join('\n'),
+    });
+    row.alignment = { vertical: 'top', wrapText: true };
   }
-  if (entries.length === 0) {
-    return `${header}\nCurrently, no actions were performed in this module.`;
-  }
-  return `${header}\n${entries.map((e) => `• ${e}`).join('\n')}`;
+
+  await workbook.xlsx.writeFile(OUTPUT_PATH);
+  console.log(`✅ Consolidated Excel report written to ${OUTPUT_PATH}`);
 }
 
-function main() {
-  const generatedAt = new Date().toISOString();
-  const sections = REPORT_SOURCES.map(buildSection);
-
-  const output = [`eCampusBuddy Automation — Consolidated Report`, `Generated: ${generatedAt}`, ...sections].join('\n\n');
-
-  fs.writeFileSync(OUTPUT_PATH, output);
-  console.log(`✅ Consolidated report written to ${OUTPUT_PATH}`);
-}
-
-main();
+main().catch((err) => {
+  console.error('Failed to generate MIS_Consolidated.xlsx:', err);
+  process.exit(1);
+});
