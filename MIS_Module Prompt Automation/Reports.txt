@@ -1,0 +1,107 @@
+After completing the Financial Year module and verifying that the URL is loaded successfully:
+Expected URL:
+https://forms.ecampusbuddy.com/index.php/m-financial_year
+
+Do not end the automation. Continue with the Reports module.
+
+Reports Module - Test Case 9
+
+Click Reports from the left navigation menu.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-reports
+Click Financial Reports.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-reports
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log the following alert in Report_Consolidated.md: "Financial Reports URL is not loaded."
+Click Balance Sheet.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/report-analytics/m-balance-sheet
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log: "Balance Sheet URL is not loaded."
+Click Income Statement.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-income-statement
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log: "Income Statement URL is not loaded."
+Click NECHE Report.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-neche-report
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log: "NECHE Report URL is not loaded."
+Click Board Report.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-board-report
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log: "Board Report URL is not loaded."
+Click Report Analytics.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-reports
+Verify that the URL is loaded successfully.
+If the URL is not loaded, log: "Report Analytics URL is not loaded."
+
+All Vendor Transactions Validation
+Click Open under All Vendor Transactions.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-all-vendor-transactions
+Measure the page loading time and store the result in Report_Consolidated.md.
+Expected loading time: 2 seconds
+If the loading time exceeds 2 seconds, log: "All Vendor Transactions loading is taking more than 2 seconds."
+Verify that the following fields are visible:
+	TOTAL AMOUNT
+	NO. OF VENDORS
+	TOTAL RECORDS
+If any of these fields are not visible, log: "TOTAL AMOUNT, NO. OF VENDORS, TOTAL RECORDS are not visible."
+Click Export CSV.
+Verify that the CSV file is downloaded successfully.
+If the download fails, log: "CSV file is not downloading."
+Measure the CSV download time and store the duration in Report_Consolidated.md.
+Enter the date filters:
+	Start Date: 11-05-2025
+	End Date: 11-06-2026
+Click Filter.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-all-vendor-transactions?start_date=2025-05-11&end_date=2026-06-11&vendor=&search=
+Balance Sheet Report Validation
+Click Reports near All Vendor Transactions.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-reports
+Click Open under Balance Sheet.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-balance-sheet
+Measure the Balance Sheet loading time and store it in Report_Consolidated.md.
+Expected loading time: 2 seconds
+If it exceeds 2 seconds, log: "Balance Sheet loading is taking more than 2 seconds."
+Click Settings.
+Verify that the Report Setting popup is displayed.
+If not visible, log: "Setting popup is not visible."
+Click Cancel.
+Click Charts.
+Verify that the Report Charts popup is displayed.
+If not visible, log: "Charts popup is not visible."
+Click Cancel.
+Click Layout.
+Verify that the Edit Report Layout: Balance Sheet popup is displayed.
+If not visible, log: "Edit Report Layout: Balance Sheet popup is not visible."
+Click Cancel.
+Income Statement Validation
+Click Income Statement.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-income-statement
+Perform the same popup validations:
+	Settings popup
+	Charts popup
+	Layout popup
+If any popup is missing, log the appropriate alert message in Report_Consolidated.md.
+NECHE Report Validation
+Click NECHE Report.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-neche-report
+Perform the same popup validations:
+	Settings popup
+	Charts popup
+	Layout popup
+Log alerts in Report_Consolidated.md if any popup is not displayed.
+Board Report Validation
+Click Board Report.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/report-analytics/m-board-report
+Verify that the page loads successfully.
+Click Report Analytics.
+Wait until the URL becomes:
+https://forms.ecampusbuddy.com/index.php/m-reports
+
+
+
+Important:
+
+Do not stop the automation if any URL validation fails.
+Write the failure message into Report_Consolidated.md.
+Continue executing the remaining Reports module validations.
+Maintain the existing logged-in browser session and do not open a new browser window.

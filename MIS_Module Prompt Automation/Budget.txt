@@ -1,0 +1,52 @@
+After completing the Trial Balance module (Expected URL: https://forms.ecampusbuddy.com/index.php/m-upload?tab=tb) and updating the results in Report_Consolidated.md, do not end the automation. Continue with the Budget module.
+
+Budget Module - Test Case 7
+
+Click Budget from the left navigation menu.
+Wait until the URL becomes:https://forms.ecampusbuddy.com/index.php/m-budget
+Click the All dropdown and select 1050.
+Verify that the Budget vs. Actual chart (budgetDeptChart) updates after selecting 1050.
+If the chart does not change, log the following alert in Report_Consolidated.md: "budgetDeptChart is not changed."
+Verify that the DoughnutChart under Spend Distribution also updates.
+If the chart does not change, log: "DoughnutChart is not changed."
+Scroll down and verify that the Department Breakdown section is visible.
+Under Department Breakdown, verify that the following columns are visible:
+	Cost Center
+	Budgeted
+	Actual Spent
+	Variance
+	Utilization
+If any of these are not visible, log: "Department Breakdown section is not visible."
+Scroll back to the top of the page and click Detailed Listing.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-budget/listing
+Click the FY-2025 (Default) dropdown and verify that the year options are displayed.
+If the options are not visible, log: "Year options are not visible."
+Click Import Budget Data.
+Verify that the following sections are visible:
+	Financial Year
+	Select CSV / Excel File
+If either section is missing, log: "Import Budget Data sections are not visible."
+Click Sample and verify that the sample CSV file is downloaded successfully.
+If the download fails, log: "Sample CSV file is not downloading."
+Click the FY-2025 dropdown and verify that the available year options are displayed.
+If the options are not visible, log: "FY-2025 year options are not visible."
+Click Choose File and upload the downloaded sample CSV file.
+Click Upload.
+Wait until the success message appears: "CSV uploaded successfully. (3 duplicate rows skipped)."
+Measure the total upload time and record it in Report_Consolidated.md.
+Expected upload time: 2 seconds
+If the upload takes more than 2 seconds, log: "Uploading time is taking more than 2 seconds."
+Under Budget Allocation Records, click Export CSV and verify that the CSV file is downloaded successfully.
+If the export fails, log: "CSV file is not exporting."
+Under Budget Allocation Records, verify that the following columns are visible:
+	ID
+	Cost Center
+	Original Total
+	-20%
+	-15%
+	-10%
+	Created
+	Actions
+If any of these columns are missing, log the following alert in Report_Consolidated.md: "Required columns are not visible under Budget Allocation Records."
+
+Important: Do not stop or fail the automation if any validation fails. Log the appropriate alert message in Report_Consolidated.md and continue executing the remaining test steps.

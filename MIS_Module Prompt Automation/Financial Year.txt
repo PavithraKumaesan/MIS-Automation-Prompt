@@ -1,0 +1,14 @@
+After completing the Budget module Under Budget Allocation Records, verify that the following columns are visible:
+	ID
+	COST CENTER
+	ORIGINAL TOTAL
+	-20%
+	-15%
+	-10%
+	CREATED
+	ACTIONS
+If any of these columns are missing, log the following alert in Report_Consolidated.md: "Required columns are not visible under Budget Allocation Records.", do not end the automation. Continue with the Budget module.
+
+Financial Year Module - Test Case 8
+Click Financial Year from the left sid bar naviagtion.
+wait for URL to become https://forms.ecampusbuddy.com/index.php/m-financial_year.

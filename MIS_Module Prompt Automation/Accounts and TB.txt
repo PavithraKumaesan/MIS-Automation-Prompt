@@ -1,0 +1,67 @@
+After completing the Payroll module and updating the results in Report_Consolidated.md, do not end the automation. Continue with the following Internal Accounts validation steps.
+
+Click Accounts from the left navigation menu.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-accounts
+Click External Accounts (next to Internal Accounts).
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-accounts?tab=external
+If the URL does not load correctly, log the following alert in Report_Consolidated.md: "External Accounts link is not properly loaded."
+Click Account Groups.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-accounts?tab=groups
+If the URL does not load correctly, log: "Account Group link is not properly loaded."
+Click Account Sub Groups.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-accounts?tab=subgroups
+If the URL does not load correctly, log: "Accounts Support Group link is not properly loaded."
+Click Internal Accounts.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-accounts?tab=internal
+If the URL does not load correctly, log: "Internal Accounts page is not properly loaded."
+Click the Search/Type Group dropdown and select 4120.
+If the group cannot be selected, log: "Account Group could not be selected."
+Click the Select Sub Group dropdown and select the first row.
+If the sub group cannot be selected, log: "Account Sub Group could not be selected."
+It have to click the 4digits textbox in Fund and type 0001 and same for Department, Subsidiary, Object Class, Object Code
+If the value cannot be entered, log: "Could not enter the Fund number."
+In the Department field, enter 0000.
+If the value cannot be entered, log: "Could not enter the Department number."
+In the Subsidiary field, enter 1101.
+If the value cannot be entered, log: "Could not enter the Subsidiary number."
+In the Object Class field, replace the existing value (for example, EXEE) with EXEA.
+If the value cannot be entered, log: "Could not enter the Object Class."
+In the Object Code field, replace the existing value (for example, E12) with E11.
+If the value cannot be entered, log: "Could not enter the Object Code."
+In the Description field, enter: sample Accounts
+Click Add Account.
+After clicking Add Account, scroll down to the Internal Master Accounts section and verify that the newly created account matches the values entered during creation:
+	Account Code
+	Description
+	Group/Sub Group
+	Department/Subsidiary
+If any of these values do not match, log the following alert in Report_Consolidated.md: "The created Internal Account details do not match the values entered during account creation."
+Scroll down further until the Import Accounts section is visible. Click Sample to download the sample CSV file.
+In the Choose File field, select the CSV file that was downloaded in the previous step and upload it.
+Click Import and measure the total time taken for the import process to complete. Record the import time in Report_Consolidated.md.
+The expected import time is 3 seconds.
+If the import takes more than 3 seconds, log the following alert in Report_Consolidated.md: "Import action is taking more than 3 seconds."
+Click Trial Balance from the left navigation menu.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-trial_balance
+Click the Upload New Data button.
+Verify that clicking Upload New Data navigates to the correct upload page.
+Expected URL: https://forms.ecampusbuddy.com/index.php/m-upload?tab=tb
+If the page does not load correctly, log the following alert in Report_Consolidated.md: "Upload New Data button is not working."
+Under the Actions section, click the Download icon and verify that the CSV file is downloaded successfully.
+If the file is not downloaded, log: "Download icon is not working."
+Under the Actions section, click the Delete icon and verify that the selected record is deleted successfully.
+If the record is not deleted, log: "Delete icon is not working."
+Scroll down the page and verify that the All Ledger Records section is visible.
+If the section is not visible, log the following alert in Report_Consolidated.md: "All Ledger Records section is not visible."
+
+
+Note - Accounts Module is 5th Test case, Trail Balance Module is 6th test case
+
+
+
+
+Important: Do not stop the automation if any validation fails. Log the appropriate alert message in Report_Consolidated.md and continue executing the remaining steps.
+
+
+
+It have to click the 4digits textbox in Fund and type

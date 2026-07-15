@@ -1,0 +1,29 @@
+After completing the Reports module and verifying that the URL is:
+https://forms.ecampusbuddy.com/index.php/m-reports
+
+Do not end the automation. Continue with the Audit Logs module.
+
+Audit Logs Module - Test Case 10
+
+Click Audit Logs from the left navigation menu.
+Wait until the URL becomes: https://forms.ecampusbuddy.com/index.php/m-audit-logs
+In the Search Activity section, click the Table input field and enter: 17569
+Click the Search icon.
+Click Export CSV.
+Verify that the CSV file is downloaded successfully.
+If the CSV file is not downloaded, log the following alert in Report_Consolidated.md: "Audit Logs CSV file is not downloading."
+Verify that data is displayed under the following columns:
+	TIMESTAMP
+	USER
+	ACTION
+	MODULE / TABLE
+	RECORD ID
+	IP ADDRESS
+	ACTIONS
+If the search results are not displayed or the filter is not working, log the following alert in Report_Consolidated.md: "Search filter is not working. No data is displayed under TIMESTAMP, USER, ACTION, MODULE / TABLE, RECORD ID, IP ADDRESS, and ACTIONS."
+
+Important:
+
+Do not stop or fail the automation if any validation fails.
+Log all failures and warnings in Report_Consolidated.md.
+Continue executing the remaining test cases using the same browser session without opening a new browser or logging in again.

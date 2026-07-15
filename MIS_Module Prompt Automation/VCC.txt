@@ -1,0 +1,73 @@
+npm run upload-vcc:ecampus
+
+
+
+Test case 2 - Upload VCC
+Create a Playwright TypeScript automation script that logs into https://forms.ecampusbuddy.com/index.php/m-welcome and performs a full upload â batch â transaction reconciliation workflow.
+Setup
+
+Navigate to https://forms.ecampusbuddy.com/index.php/m-welcome.
+Enter the username into the username/email field.
+Enter the password into the password field.
+Read credentials from environment variables (ECAMPUS_USERNAME, ECAMPUS_PASSWORD) via a .env file and the dotenv package â do not hardcode credentials in the script.
+
+Login / Captcha
+
+The site requires manual captcha verification. After filling in the credentials:
+
+Pause the script and print a message asking me to solve the captcha manually in the browser window.
+Wait for me to press Enter in the terminal (using Node's readline) before continuing.
+Add a comment noting page.pause() as an alternative approach using the Playwright Inspector.
+
+
+After I confirm the captcha is solved, click the Sign In button.
+Run the browser in headed mode (headless: false) so the captcha is visible and solvable.
+Use resilient selectors as a starting point (e.g., input[type="email"], input[type="password"], button:has-text("Sign In")), and add a comment noting that I should inspect the real page and adjust selectors if needed.
+
+Dashboard â Upload
+
+After sign-in, wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-dashboard.
+Click the "Upload" module link/button in the left-side navigation.
+Wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-upload.
+Click Upload VCC Near Upload PO.
+On that page, click "Choose File" and upload the file at:
+C:\Users\akspa\OneDrive\Desktop\Automation\MIS-Stagging\upload_files\vcc_sample.csv
+Click the "Cash Account Code" text box and type: 0001-0001-0011-1000-000.
+Click the "Upload" button to submit.
+
+Batches â first pass
+
+After the upload completes, wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-batches.
+Read the Total, Processed, and Pending counts from the page and store them in a local tracking file, .env.po (plain key=value text file â not loaded via dotenv, since these are runtime results, not secrets).
+If Pending > 0, click Processed
+After clicking, wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-transactions/221/0.
+click Processed
+Wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-transactions/221/1.
+
+Transaction lookup
+
+Read the number beginning with 8150 from the Account Â· Description field, then append it to .env.po using this format:
+	Leave one blank line after the existing content in the file.
+	Write the label Upload VCC on its own line.
+	On the next line, write the 8150â¦ number that was read from the page.
+Click the Transactions module in the left-side navigation.
+Wait for the URL to become https://forms.ecampusbuddy.com/index.php/m-all-transactions.
+Click "VCC Transactions" (located near "Purchase Orders" in the navigation/page).
+Enter the 8150â¦ number (read from .env.po) into the search box and click Search Records.
+After clicking Search Records, wait 3 seconds, then wait for the matching batch to appear under PO Transaction.
+Once the batch is visible, click Clear.
+Click "VCC Transactions" (located near "Purchase Orders" in the navigation/page).
+Enter the code 0001-0001-0011-1000-000 into the search box and click Search Records.
+After clicking Search Records, wait 3 seconds, then wait for the matching batch to appear under PO Transaction.
+Once the batch is visible, click Clear.
+
+Additional notes for the implementation:
+
+Use TypeScript with async/await throughout.
+Include comments explaining each major step and section.
+Use resilient selectors where possible (text-based, role-based) and flag with comments any selector likely to need adjustment after inspecting the live DOM.
+Add reasonable timeouts and basic error handling around all waitForURL calls and data-reads (Total/Processed/Pending, the 8150â¦ number) in case the page structure differs from expectations.
+Handle the Windows file path correctly for setInputFiles (e.g., raw string or forward slashes).
+Since this workflow reads values from the page and writes them to .env.po, use plain file read/write (e.g., Node's fs) rather than dotenv for that file â dotenv is only for loading the login credentials at startup.
+try/finally guarantees the browser closes even if something breaks midway (e.g., a selector isn't found, a waitForURL times out). Without it, a failed run leaves a orphaned browser window open every time.
+(explicit close + success message) is what runs in the happy path â it tells you the automation actually finished all steps successfully, not just that the browser happened to close.
